@@ -1,14 +1,14 @@
-// 16.1 Creating Tasks
+-- 16.1 Creating Tasks
 
 CREATE OR REPLACE TRANSIENT DATABASE TASK_DB;
 
-// Prepare table
+-- Prepare table
 CREATE OR REPLACE TABLE CUSTOMERS (
     CUSTOMER_ID INT AUTOINCREMENT START = 1 INCREMENT =1,
     FIRST_NAME VARCHAR(40) DEFAULT 'JENNIFER' ,
     CREATE_DATE DATE)
     
-// Create task
+-- Create task
 CREATE OR REPLACE TASK CUSTOMER_INSERT
     WAREHOUSE = COMPUTE_WH
     SCHEDULE = '1 MINUTE'
@@ -17,15 +17,15 @@ CREATE OR REPLACE TASK CUSTOMER_INSERT
     
 SHOW TASKS;
 
-// Task starting and suspending
+-- Task starting and suspending
 ALTER TASK CUSTOMER_INSERT RESUME;
 ALTER TASK CUSTOMER_INSERT SUSPEND;
 
 SELECT * FROM CUSTOMERS
 
 
-// 16.2 Using CRON
-
+-- 16.2 Using CRON
+    
 CREATE OR REPLACE TASK CUSTOMER_INSERT
     WAREHOUSE = COMPUTE_WH
     SCHEDULE = '60 MINUTE'
@@ -47,13 +47,13 @@ CREATE OR REPLACE TASK CUSTOMER_INSERT
 # | | | | |
 # * * * * *
 
-// Every minute
+-- Every minute
 SCHEDULE = 'USING CRON * * * * * UTC'
   
-// Every day at 6am UTC timezone
+-- Every day at 6am UTC timezone
 SCHEDULE = 'USING CRON 0 6 * * * UTC'
 
-// Every hour starting at 9 AM and ending at 5 PM on Sundays 
+-- Every hour starting at 9 AM and ending at 5 PM on Sundays 
 SCHEDULE = 'USING CRON 0 9-17 * * SUN America/Los_Angeles'
 
 CREATE OR REPLACE TASK CUSTOMER_INSERT
@@ -63,7 +63,7 @@ CREATE OR REPLACE TASK CUSTOMER_INSERT
     INSERT INTO CUSTOMERS(CREATE_DATE) VALUES(CURRENT_TIMESTAMP);
 
 
-// 16.3 Creating Tree of Tasks
+-- 16.3 Creating Tree of Tasks
 
 USE TASK_DB;
  
@@ -71,30 +71,30 @@ SHOW TASKS;
 
 SELECT * FROM CUSTOMERS;
 
-// Prepare a second table
+-- Prepare a second table
 CREATE OR REPLACE TABLE CUSTOMERS2 (
     CUSTOMER_ID INT,
     FIRST_NAME VARCHAR(40),
     CREATE_DATE DATE)
      
-// Suspend parent task
+-- Suspend parent task
 ALTER TASK CUSTOMER_INSERT SUSPEND;
     
-// Create a child task
+-- Create a child task
 CREATE OR REPLACE TASK CUSTOMER_INSERT2
     WAREHOUSE = COMPUTE_WH
     AFTER CUSTOMER_INSERT
     AS 
     INSERT INTO CUSTOMERS2 SELECT * FROM CUSTOMERS;
       
-// Prepare a third table
+-- Prepare a third table
 CREATE OR REPLACE TABLE CUSTOMERS3 (
     CUSTOMER_ID INT,
     FIRST_NAME VARCHAR(40),
     CREATE_DATE DATE,
     INSERT_DATE DATE DEFAULT DATE(CURRENT_TIMESTAMP))    
     
-// Create a child task
+-- Create a child task
 CREATE OR REPLACE TASK CUSTOMER_INSERT3
     WAREHOUSE = COMPUTE_WH
     AFTER CUSTOMER_INSERT2
@@ -106,7 +106,7 @@ SHOW TASKS;
 ALTER TASK CUSTOMER_INSERT 
 SET SCHEDULE = '1 MINUTE'
 
-// Resume tasks (first root task)
+-- Resume tasks (first root task)
 ALTER TASK CUSTOMER_INSERT RESUME;
 ALTER TASK CUSTOMER_INSERT2 RESUME;
 ALTER TASK CUSTOMER_INSERT3 RESUME;
@@ -115,15 +115,15 @@ SELECT * FROM CUSTOMERS2
 
 SELECT * FROM CUSTOMERS3
 
-// Suspend tasks again
+-- Suspend tasks again
 ALTER TASK CUSTOMER_INSERT SUSPEND;
 ALTER TASK CUSTOMER_INSERT2 SUSPEND;
 ALTER TASK CUSTOMER_INSERT3 SUSPEND;
 
 
-// 16.4 Calling a Stotrd Procedure
+-- 16.4 Calling a Stotrd Procedure
 
-// Create a stored procedure
+-- Create a stored procedure
 USE TASK_DB;
 
 SELECT * FROM CUSTOMERS
@@ -154,9 +154,9 @@ ALTER TASK CUSTOMER_TAKS_PROCEDURE RESUME;
 SELECT * FROM CUSTOMERS;
 
 
-// 16.5 Task History & Error Handling
+-- 16.5 Task History & Error Handling
 
-// Create a stored procedure
+-- Create a stored procedure
 USE TASK_DB;
 
 SELECT * FROM CUSTOMERS
