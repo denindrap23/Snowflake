@@ -1,6 +1,6 @@
-// 1.1 Loading Data
+-- 1.1 Loading Data
   
-//Creating the table / Meta data
+-- Creating the table / Meta data
 
 CREATE TABLE "OUR_FIRST_DB"."PUBLIC"."LOAN_PAYMENT" (
   "Loan_ID" STRING,
@@ -15,18 +15,18 @@ CREATE TABLE "OUR_FIRST_DB"."PUBLIC"."LOAN_PAYMENT" (
   "education" STRING,
   "Gender" STRING);
    
- //Check that table is empy
+ -- Check that table is empy
  USE DATABASE OUR_FIRST_DB;
 
  SELECT * FROM LOAN_PAYMENT;
  
- //Loading the data from S3 bucket
+ -- Loading the data from S3 bucket
   
  COPY INTO LOAN_PAYMENT
-    FROM s3://bucketsnowflakes3/Loan_payments_data.csv
+    FROM s3:--bucketsnowflakes3/Loan_payments_data.csv
     file_format = (type = csv 
                    field_delimiter = ',' 
                    skip_header=1);
     
-//Validate
+-- Validate
  SELECT * FROM LOAN_PAYMENT;
