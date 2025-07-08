@@ -1,4 +1,4 @@
-// 19.1 Creating Data Masking Policy
+-- 19.1 Creating Data Masking Policy
 
 USE DEMO_DB;
 USE ROLE ACCOUNTADMIN;
@@ -62,7 +62,7 @@ USE ROLE ANALYST_MASKED;
 SELECT * FROM CUSTOMERS;
 
 
-// 19.2 Unset & Replace Policy
+-- 19.2 Unset & Replace Policy
 
 USE ROLE ACCOUNTADMIN;
 
@@ -123,7 +123,7 @@ USE ROLE ANALYST_MASKED;
 SELECT * FROM CUSTOMERS;
 
 
-// 19.3 Alter Existing Policy
+-- 19.3 Alter Existing Policy
 
 -- Alter existing policies 
 USE ROLE ANALYST_MASKED;
@@ -140,7 +140,7 @@ ALTER masking policy phone SET body ->
 ALTER TABLE CUSTOMERS MODIFY COLUMN email UNSET MASKING POLICY;
 
 
-// 19.4 Real-Life Examples
+-- 19.4 Real-Life Examples
 
 --- More examples - 1 - ---
 USE ROLE ACCOUNTADMIN;
