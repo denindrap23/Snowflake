@@ -1,4 +1,4 @@
-// 7.1 Create Integration
+-- 7.1 Create Integration
 
 USE DATABASE DEMO_DB;
 -- create integration object that contains the access information
@@ -7,13 +7,13 @@ CREATE STORAGE INTEGRATION azure_integration
   STORAGE_PROVIDER = AZURE
   ENABLED = TRUE
   AZURE_TENANT_ID = '9ecede0b-0e07-4da4-8047-e0672d6e403e'
-  STORAGE_ALLOWED_LOCATIONS = ('azure://storageaccountsnow.blob.core.windows.net/snowflakecsv', 'azure://storageaccountsnow.blob.core.windows.net/snowflakejson');
+  STORAGE_ALLOWED_LOCATIONS = ('azure:--storageaccountsnow.blob.core.windows.net/snowflakecsv', 'azure:--storageaccountsnow.blob.core.windows.net/snowflakejson');
 
 -- Describe integration object to provide access
 DESC STORAGE integration azure_integration;
 
 
-// 7.2 Create Stage
+-- 7.2 Create Stage
 
 ---- Create file format & stage objects ----
 -- create file format
@@ -25,20 +25,20 @@ create or replace file format demo_db.public.fileformat_azure
 -- create stage object
 create or replace stage demo_db.public.stage_azure
     STORAGE_INTEGRATION = azure_integration
-    URL = 'azure://storageaccountsnow.blob.core.windows.net/snowflakecsv'
+    URL = 'azure:--storageaccountsnow.blob.core.windows.net/snowflakecsv'
     FILE_FORMAT = fileformat_azure;
 
 -- list files
 LIST @demo_db.public.stage_azure;
 
 
-// 7.3 Load CSV
+-- 7.3 Load CSV
 
 ---- Query files & Load data ----
 --query files
 SELECT 
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-      $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 
+      $12, $13, $14, $15, $16, $17, $18, $19, $20
 FROM @demo_db.public.stage_azure;
 
 CREATE OR REPLACE table happiness (
@@ -70,7 +70,7 @@ FROM @demo_db.public.stage_azure;
 SELECT * FROM HAPPINESS;
 
 
-// 7.4 Load JSON
+-- 7.4 Load JSON
 
 --- Load JSON ---- 
 CREATE OR REPLACE file format demo_db.public.fileformat_azure_json
@@ -78,7 +78,7 @@ CREATE OR REPLACE file format demo_db.public.fileformat_azure_json
 
 CREATE OR REPLACE stage demo_db.public.stage_azure
       STORAGE_INTEGRATION = azure_integration
-      URL = 'azure://storageaccountsnow.blob.core.windows.net/snowflakejson'
+      URL = 'azure:--storageaccountsnow.blob.core.windows.net/snowflakejson'
       FILE_FORMAT = fileformat_azure_json; 
 
 LIST  @demo_db.public.stage_azure;
