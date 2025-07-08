@@ -1,4 +1,4 @@
-// 18.1 Create Materialized View
+-- 18.1 Create Materialized View
 -- Remove caching just to have a fair test -- Part 1
 ALTER SESSION SET USE_CACHED_RESULT=FALSE; -- disable global caching
 ALTER warehouse compute_wh suspend;
@@ -67,7 +67,7 @@ ORDER BY YEAR;
 SHOW MATERIALIZED VIEWS;
 
 
-// 18.2 Refresh in Materialized Views
+-- 18.2 Refresh in Materialized Views
   
 -- Remove caching just to have a fair test -- Part 2
 ALTER SESSION SET USE_CACHED_RESULT=FALSE; -- disable global caching
@@ -139,7 +139,7 @@ SHOW MATERIALIZED VIEWS;
 SELECT * FROM table(information_schema.materialized_view_refresh_history());
 
 
-// 18.3 Maintenance Cost
+-- 18.3 Maintenance Cost
 
 SHOW MATERIALIZED VIEWS;
 
