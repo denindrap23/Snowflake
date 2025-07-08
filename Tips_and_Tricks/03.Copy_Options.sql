@@ -1,7 +1,7 @@
-// 3.1 Validation Mode
+-- 3.1 Validation Mode
 
 ---- VALIDATION_MODE ----
-// Prepare database & table
+-- Prepare database & table
 CREATE OR REPLACE DATABASE COPY_DB;
 
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
@@ -13,31 +13,31 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     SUBCATEGORY VARCHAR(30)
     );
 
-// Prepare stage object
+-- Prepare stage object
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/size/';
+    url='s3:--snowflakebucket-copyoption/size/';
   
 LIST @COPY_DB.PUBLIC.aws_stage_copy;
       
-//Load data using copy command
+--Load data using copy command
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    VALIDATION_MODE = RETURN_ERRORS
+    VALIDATION_MODE = RETURN_ERRORS;
        
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    VALIDATION_MODE = RETURN_5_ROWS 
+    VALIDATION_MODE = RETURN_5_ROWS;
 
   
-// 3.2 Rejected Records
+-- 3.2 Rejected Records
    
 ---- Use files with errors ----
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/returnfailed/';
+    url='s3:--snowflakebucket-copyoption/returnfailed/';
 
 LIST @COPY_DB.PUBLIC.aws_stage_copy;    
 
@@ -45,13 +45,13 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    VALIDATION_MODE = RETURN_ERRORS
+    VALIDATION_MODE = RETURN_ERRORS;
 
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    VALIDATION_MODE = RETURN_1_rows
+    VALIDATION_MODE = RETURN_1_rows;
     
 -------------- Working with error results -----------
 
@@ -62,7 +62,8 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     PROFIT INT,
     QUANTITY INT,
     CATEGORY VARCHAR(30),
-    SUBCATEGORY VARCHAR(30));
+    SUBCATEGORY VARCHAR(30)
+    );
 
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
@@ -70,7 +71,7 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
     pattern='.*Order.*'
     VALIDATION_MODE = RETURN_ERRORS;
 
-// Storing rejected /failed results in a table
+-- Storing rejected /failed results in a table
 CREATE OR REPLACE TABLE rejected AS 
 select rejected_record from table(result_scan(last_query_id()));
 
@@ -84,7 +85,7 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    ON_ERROR=CONTINUE
+    ON_ERROR=CONTINUE;
    
 SELECT * FROM TABLE(validate(orders, job_id => '_last'));
 
@@ -105,10 +106,10 @@ FROM
 SELECT * FROM rejected_values;
 
 
-// 3.3 Size Limit
+-- 3.3 Size Limit
 
 ---- SIZE_LIMIT ----
-// Prepare database & table
+-- Prepare database & table
 CREATE OR REPLACE DATABASE COPY_DB;
 
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
@@ -120,14 +121,14 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     SUBCATEGORY VARCHAR(30)
     );
     
-// Prepare stage object
+-- Prepare stage object
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/size/';
+    url='s3:--snowflakebucket-copyoption/size/';
      
-// List files in stage
+-- List files in stage
 LIST @aws_stage_copy;
 
-//Load data using copy command
+--Load data using copy command
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
@@ -135,7 +136,7 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
     SIZE_LIMIT=20000;
 
 
-// 3.4 Return Failed Only
+-- 3.4 Return Failed Only
 
 ---- RETURN_FAILED_ONLY ----
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
@@ -144,29 +145,30 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     PROFIT INT,
     QUANTITY INT,
     CATEGORY VARCHAR(30),
-    SUBCATEGORY VARCHAR(30));
+    SUBCATEGORY VARCHAR(30)
+    );
 
-// Prepare stage object
+-- Prepare stage object
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/returnfailed/';
+    url='s3:--snowflakebucket-copyoption/returnfailed/';
   
-LIST @COPY_DB.PUBLIC.aws_stage_copy
+LIST @COPY_DB.PUBLIC.aws_stage_copy;
     
-//Load data using copy command
+--Load data using copy command
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    RETURN_FAILED_ONLY = TRUE
+    RETURN_FAILED_ONLY = TRUE;
    
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
     ON_ERROR =CONTINUE
-    RETURN_FAILED_ONLY = TRUE
+    RETURN_FAILED_ONLY = TRUE;
 
-// Default = FALSE
+-- Default = FALSE
 
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     ORDER_ID VARCHAR(30),
@@ -174,16 +176,17 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     PROFIT INT,
     QUANTITY INT,
     CATEGORY VARCHAR(30),
-    SUBCATEGORY VARCHAR(30));
+    SUBCATEGORY VARCHAR(30)
+    );
 
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
-    ON_ERROR =CONTINUE
+    ON_ERROR =CONTINUE;
 
 
-// 3.5 Truncate Columns
+-- 3.5 Truncate Columns
 
 ---- TRUNCATECOLUMNS ----
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
@@ -192,19 +195,20 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     PROFIT INT,
     QUANTITY INT,
     CATEGORY VARCHAR(10),
-    SUBCATEGORY VARCHAR(30));
+    SUBCATEGORY VARCHAR(30)
+    );
 
-// Prepare stage object
+-- Prepare stage object
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/size/';
+    url='s3:--snowflakebucket-copyoption/size/';
   
-LIST @COPY_DB.PUBLIC.aws_stage_copy
+LIST @COPY_DB.PUBLIC.aws_stage_copy;
      
-//Load data using copy command
+--Load data using copy command
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
-    pattern='.*Order.*'
+    pattern='.*Order.*';
 
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
@@ -215,7 +219,7 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
 SELECT * FROM ORDERS; 
 
 
-// 3.6 Force
+-- 3.6 Force
 
 ---- FORCE ----
 CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
@@ -226,19 +230,19 @@ CREATE OR REPLACE TABLE  COPY_DB.PUBLIC.ORDERS (
     CATEGORY VARCHAR(30),
     SUBCATEGORY VARCHAR(30));
 
-// Prepare stage object
+-- Prepare stage object
 CREATE OR REPLACE STAGE COPY_DB.PUBLIC.aws_stage_copy
-    url='s3://snowflakebucket-copyoption/size/';
+    url='s3:--snowflakebucket-copyoption/size/';
   
 LIST @COPY_DB.PUBLIC.aws_stage_copy
     
-//Load data using copy command
+--Load data using copy command
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
     pattern='.*Order.*'
 
-// Not possible to load file that have been loaded and data has not been modified
+-- Not possible to load file that have been loaded and data has not been modified
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
     file_format= (type = csv field_delimiter=',' skip_header=1)
@@ -246,7 +250,7 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
    
 SELECT * FROM ORDERS;    
 
-// Using the FORCE option
+-- Using the FORCE option
 
 COPY INTO COPY_DB.PUBLIC.ORDERS
     FROM @aws_stage_copy
@@ -255,29 +259,27 @@ COPY INTO COPY_DB.PUBLIC.ORDERS
     FORCE = TRUE;
 
 
-// 3.7 Load History
+-- 3.7 Load History
 
 -- Query load history within a database --
 USE COPY_DB;
 
-SELECT * FROM information_schema.load_history
+SELECT * FROM information_schema.load_history;
 
 -- Query load history gloabally from SNOWFLAKE database --
-SELECT * FROM snowflake.account_usage.load_history
+SELECT * FROM snowflake.account_usage.load_history;
 
-// Filter on specific table & schema
+-- Filter on specific table & schema
 SELECT * FROM snowflake.account_usage.load_history
   WHERE schema_name='PUBLIC' AND
-  table_name='ORDERS'
+  table_name='ORDERS';
     
-// Filter on specific table & schema
+-- Filter on specific table & schema
 SELECT * FROM snowflake.account_usage.load_history
   WHERE schema_name='PUBLIC' AND
   table_name='ORDERS' AND
-  error_count > 0
+  error_count > 0;
     
-// Filter on specific table & schema
+-- Filter on specific table & schema
 SELECT * FROM snowflake.account_usage.load_history
-WHERE DATE(LAST_LOAD_TIME) <= DATEADD(days,-1,CURRENT_DATE)
-
-    
+WHERE DATE(LAST_LOAD_TIME) <= DATEADD(days,-1,CURRENT_DATE);
