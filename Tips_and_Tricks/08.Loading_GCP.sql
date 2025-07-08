@@ -1,23 +1,23 @@
-// 8.1 Create Integration Object
+-- 8.1 Create Integration Object
   
 -- create integration object that contains the access information
 CREATE STORAGE INTEGRATION gcp_integration
   TYPE = EXTERNAL_STAGE
   STORAGE_PROVIDER = GCS
   ENABLED = TRUE
-  STORAGE_ALLOWED_LOCATIONS = ('gcs://bucket/path', 'gcs://bucket/path2');
+  STORAGE_ALLOWED_LOCATIONS = ('gcs:--bucket/path', 'gcs:--bucket/path2');
 
 -- Describe integration object to provide access
 DESC STORAGE integration gcp_integration;
 
 
-// 8.2 Query & Load Data
+-- 8.2 Query & Load Data
 
 ---- Query files & Load data ----
 --query files
 SELECT 
-    $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,
-    $12,$13,$14,$15,$16,$17,$18,$19,$20
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+    $12, $13, $14, $15, $16, $17, $18, $19, $20
 FROM @demo_db.public.stage_gcp;
 
 CREATE OR REPLACE table happiness (
@@ -49,7 +49,7 @@ FROM @demo_db.public.stage_gcp;
 SELECT * FROM HAPPINESS;
 
 
-// 8.2 Unload Data
+-- 8.2 Unload Data
 
 ------- Unload data -----
 USE ROLE ACCOUNTADMIN;
@@ -60,7 +60,7 @@ CREATE STORAGE INTEGRATION gcp_integration
   TYPE = EXTERNAL_STAGE
   STORAGE_PROVIDER = GCS
   ENABLED = TRUE
-  STORAGE_ALLOWED_LOCATIONS = ('gcs://snowflakebucketgcp', 'gcs://snowflakebucketgcpjson');
+  STORAGE_ALLOWED_LOCATIONS = ('gcs:--snowflakebucketgcp', 'gcs:--snowflakebucketgcpjson');
   
 -- create file format
 CREATE OR REPLACE file format demo_db.public.fileformat_gcp
@@ -71,12 +71,12 @@ CREATE OR REPLACE file format demo_db.public.fileformat_gcp
 -- create stage object
 CREATE OR REPLACE stage demo_db.public.stage_gcp
     STORAGE_INTEGRATION = gcp_integration
-    URL = 'gcs://snowflakebucketgcp/csv_happiness'
+    URL = 'gcs:--snowflakebucketgcp/csv_happiness'
     FILE_FORMAT = fileformat_gcp
     ;
 
 ALTER STORAGE INTEGRATION gcp_integration
-SET  storage_allowed_locations=('gcs://snowflakebucketgcp', 'gcs://snowflakebucketgcpjson');
+SET  storage_allowed_locations=('gcs:--snowflakebucketgcp', 'gcs:--snowflakebucketgcpjson');
 
 SELECT * FROM HAPPINESS;
 
