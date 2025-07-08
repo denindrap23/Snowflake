@@ -1,8 +1,8 @@
-// 4.1 Create Stage & Load Raw (JSON)
+-- 4.1 Create Stage & Load Raw (JSON)
   
-// First step: Load Raw JSON
+-- First step: Load Raw JSON
 CREATE OR REPLACE stage MANAGE_DB.EXTERNAL_STAGES.JSONSTAGE
-     url='s3://bucketsnowflake-jsondemo';
+     url='s3:--bucketsnowflake-jsondemo';
 
 CREATE OR REPLACE file format MANAGE_DB.FILE_FORMATS.JSONFORMAT
     TYPE = JSON;
@@ -18,14 +18,14 @@ COPY INTO OUR_FIRST_DB.PUBLIC.JSON_RAW
 SELECT * FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
 
-// 4.2 Parsing & Analyze (JSON)
+-- 4.2 Parsing & Analyze (JSON)
 
-// Selecting attribute/column
-SELECT RAW_FILE:city FROM OUR_FIRST_DB.PUBLIC.JSON_RAW
+-- Selecting attribute/column
+SELECT RAW_FILE:city FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
-SELECT $1:first_name FROM OUR_FIRST_DB.PUBLIC.JSON_RAW
+SELECT $1:first_name FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
-// Selecting attribute/column - formattted
+-- Selecting attribute/column - formattted
 SELECT RAW_FILE:first_name::string AS first_name  FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
 SELECT RAW_FILE:id::int AS id  FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
@@ -35,16 +35,15 @@ SELECT
     RAW_FILE:first_name::STRING AS first_name,
     RAW_FILE:last_name::STRING AS last_name,
     RAW_FILE:gender::STRING AS gender
-
 FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
-// Handling nested data
+-- Handling nested data
 SELECT RAW_FILE:job AS job  FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
 
-// 4.3 Handling Nested Data (JSON)
+-- 4.3 Handling Nested Data (JSON)
 
-// Handling nested data  
+-- Handling nested data  
 SELECT RAW_FILE:job AS job  FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
 SELECT 
@@ -57,7 +56,7 @@ SELECT
     RAW_FILE:job.title::STRING AS title
 FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
-// Handling arreys
+-- Handling arreys
 
 SELECT
     RAW_FILE:prev_company AS prev_company
@@ -82,10 +81,10 @@ SELECT
     RAW_FILE:first_name::STRING AS first_name,
     RAW_FILE:prev_company[1]::STRING AS prev_company
 FROM OUR_FIRST_DB.PUBLIC.JSON_RAW
-ORDER BY id
+ORDER BY id;
 
   
-// 4.4 Dealing with Hierarchy (JSON)
+-- 4.4 Dealing with Hierarchy (JSON)
 
 SELECT 
     RAW_FILE:spoken_languages AS spoken_languages
@@ -115,7 +114,7 @@ SELECT
     RAW_FILE:first_name::STRING AS First_name,
     RAW_FILE:spoken_languages[0].LANGUAGE::STRING AS First_language,
     RAW_FILE:spoken_languages[0].LEVEL::STRING AS Level_spoken
-FROM OUR_FIRST_DB.PUBLIC.JSON_RAW
+FROM OUR_FIRST_DB.PUBLIC.JSON_RAW;
 
 SELECT 
     RAW_FILE:id::int AS id,
@@ -137,7 +136,7 @@ SELECT
     RAW_FILE:spoken_languages[2].LANGUAGE::STRING AS First_language,
     RAW_FILE:spoken_languages[2].LEVEL::STRING AS Level_spoken
 FROM OUR_FIRST_DB.PUBLIC.JSON_RAW
-ORDER BY ID
+ORDER BY ID;
 
 SELECT
     RAW_FILE:first_name::STRING AS First_name,
@@ -146,9 +145,9 @@ SELECT
 FROM OUR_FIRST_DB.PUBLIC.JSON_RAW, TABLE(flatten(RAW_FILE:spoken_languages)) f;
 
 
-// 4.5 Insert the Final Data
+-- 4.5 Insert the Final Data
 
-// Option 1: CREATE TABLE AS
+-- Option 1: CREATE TABLE AS
 CREATE OR REPLACE TABLE Languages AS
 SELECT
     RAW_FILE:first_name::STRING AS First_name,
@@ -160,7 +159,7 @@ SELECT * FROM Languages;
 
 TRUNCATE TABLE languages;
 
-// Option 2: INSERT INTO
+-- Option 2: INSERT INTO
 INSERT INTO Languages
 SELECT
     RAW_FILE:first_name::STRING AS First_name,
@@ -171,41 +170,41 @@ FROM OUR_FIRST_DB.PUBLIC.JSON_RAW, TABLE(flatten(RAW_FILE:spoken_languages)) f;
 SELECT * FROM Languages;
 
 
-// 4.6 Querying PARQUET Data
+-- 4.6 Querying PARQUET Data
 
-// Create file format and stage object  
+-- Create file format and stage object  
 CREATE OR REPLACE FILE FORMAT MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT
     TYPE = 'parquet';
 
 CREATE OR REPLACE STAGE MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE
-    url = 's3://snowflakeparquetdemo'   
+    url = 's3:--snowflakeparquetdemo'   
     FILE_FORMAT = MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT;
 
-// Preview the data
+-- Preview the data
 LIST  @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE;   
     
 SELECT * FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE;
     
-// File format in Queries
+-- File format in Queries
 CREATE OR REPLACE STAGE MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE
-    url = 's3://snowflakeparquetdemo'  
+    url = 's3:--snowflakeparquetdemo'  
     
 SELECT * 
 FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE
-(file_format => 'MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT')
+(file_format => 'MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT');
 
-// Quotes can be omitted in case of the current namespace
+-- Quotes can be omitted in case of the current namespace
 USE MANAGE_DB.FILE_FORMATS;
 
 SELECT * 
 FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE
-(file_format => MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT)
+(file_format => MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT);
 
 CREATE OR REPLACE STAGE MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE
-    url = 's3://snowflakeparquetdemo'   
+    url = 's3:--snowflakeparquetdemo'   
     FILE_FORMAT = MANAGE_DB.FILE_FORMATS.PARQUET_FORMAT;
 
-// Syntax for Querying unstructured data
+-- Syntax for Querying unstructured data
 SELECT 
     $1:__index_level_0__,
     $1:cat_id,
@@ -222,12 +221,12 @@ SELECT
     $1:"value"
 FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE;
 
-// Date conversion 
+-- Date conversion 
 SELECT 1;
 
 SELECT DATE(365*60*60*24);
 
-// Querying with conversions and aliases  
+-- Querying with conversions and aliases  
 SELECT 
     $1:__index_level_0__::INT AS index_level,
     $1:cat_id::VARCHAR(50) AS category,
@@ -241,9 +240,9 @@ SELECT
 FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE;
 
 
-// 4.7 Loading PARQUET Data
+-- 4.7 Loading PARQUET Data
   
-// Adding metadata
+-- Adding metadata
 SELECT 
     $1:__index_level_0__::INT AS index_level,
     $1:cat_id::VARCHAR(50) AS category,
@@ -259,9 +258,9 @@ SELECT
     TO_TIMESTAMP_NTZ(current_timestamp) AS LOAD_DATE
 FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE;
 
-SELECT TO_TIMESTAMP_NTZ(current_timestamp)
+SELECT TO_TIMESTAMP_NTZ(current_timestamp);
 
-// Create destination table
+-- Create destination table
 CREATE OR REPLACE TABLE OUR_FIRST_DB.PUBLIC.PARQUET_DATA (
     ROW_NUMBER INT,
     index_level INT,
@@ -273,9 +272,10 @@ CREATE OR REPLACE TABLE OUR_FIRST_DB.PUBLIC.PARQUET_DATA (
     state_id VARCHAR(50),
     store_id VARCHAR(50),
     value INT,
-    Load_date timestamp DEFAULT TO_TIMESTAMP_NTZ(CURRENT_TIMESTAMP))
+    Load_date timestamp DEFAULT TO_TIMESTAMP_NTZ(CURRENT_TIMESTAMP)
+    );
 
-// Load the parquet data
+-- Load the parquet data
 COPY INTO OUR_FIRST_DB.PUBLIC.PARQUET_DATA
     FROM (
         SELECT 
@@ -293,4 +293,3 @@ COPY INTO OUR_FIRST_DB.PUBLIC.PARQUET_DATA
         FROM @MANAGE_DB.EXTERNAL_STAGES.PARQUETSTAGE);
             
 SELECT * FROM OUR_FIRST_DB.PUBLIC.PARQUET_DATA;
-
