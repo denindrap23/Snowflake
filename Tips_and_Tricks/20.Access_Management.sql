@@ -1,4 +1,4 @@
-// 20.1 Account Admin
+-- 20.1 Account Admin
 
 --- User 1 ---
 CREATE USER maria PASSWORD = '123' 
@@ -21,7 +21,7 @@ MUST_CHANGE_PASSWORD = TRUE;
 GRANT ROLE SYSADMIN TO USER adam;
 
 
-// 20.2 Security Admin
+-- 20.2 Security Admin
   
 -- SECURITYADMIN role --
 --  Create and Manage Roles & Users --
@@ -66,7 +66,7 @@ MUST_CHANGE_PASSWORD = TRUE;
 GRANT ROLE hr_admin TO USER mike_hr_admin;
 
 
-// 20.3 System  Admin
+-- 20.3 System  Admin
   
 -- SYSADMIN --
 -- Create a warehouse of size X-SMALL
@@ -95,7 +95,7 @@ GRANT ownership ON database hr_db TO ROLE hr_admin;
 GRANT ownership ON SCHEMA hr_db.public TO ROLE hr_admin
 
 
-// 20.4 Custom Role
+-- 20.4 Custom Role
 
 USE ROLE SALES_ADMIN;
 USE SALES_DATABASE;
@@ -148,7 +148,7 @@ GRANT DELETE ON TABLE SALES_DATABASE.PUBLIC.CUSTOMERS TO ROLE SALES_USERS
 USE ROLE SALES_ADMIN;
 
 
-// 20.5 User Admin
+-- 20.5 User Admin
 
 -- USERADMIN --
 --- User 4 ---
