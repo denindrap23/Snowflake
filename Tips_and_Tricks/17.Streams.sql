@@ -1,4 +1,4 @@
-// 17.1 Insert Operation
+-- 17.1 Insert Operation
 
 -------------------- Stream example: INSERT ------------------------
 CREATE OR REPLACE TRANSIENT DATABASE STREAMS_DB;
@@ -22,9 +22,9 @@ INSERT INTO sales_raw_staging
         (5,'Cereals',5.98,2,1);  
 
 CREATE OR REPLACE table store_table(
-  store_id number,
-  location varchar,
-  employees number);
+	store_id number,
+	location varchar,
+	employees number);
 
 INSERT INTO STORE_TABLE VALUES(1,'Chicago',33);
 INSERT INTO STORE_TABLE VALUES(2,'London',12);
@@ -88,7 +88,7 @@ INSERT INTO sales_final_table
     ST.LOCATION, 
     ST.EMPLOYEES 
     FROM SALES_STREAM SA
-    JOIN STORE_TABLE ST ON ST.STORE_ID=SA.STORE_ID ;
+    JOIN STORE_TABLE ST ON ST.STORE_ID = SA.STORE_ID ;
 
 -- Get changes on data using stream (INSERTS)
 SELECT * FROM sales_stream;
@@ -110,7 +110,7 @@ INSERT INTO sales_final_table
     ST.LOCATION, 
     ST.EMPLOYEES 
     FROM SALES_STREAM SA
-    JOIN STORE_TABLE ST ON ST.STORE_ID=SA.STORE_ID ;
+    JOIN STORE_TABLE ST ON ST.STORE_ID = SA.STORE_ID ;
                  
 SELECT * FROM SALES_FINAL_TABLE;        
 
@@ -119,7 +119,7 @@ SELECT * FROM SALES_RAW_STAGING;
 SELECT * FROM SALES_STREAM;
 
 
-// 17.2 Update Operation
+-- 17.2 Update Operation
   
 -- ******* UPDATE 1 ********
 
@@ -132,15 +132,15 @@ SET PRODUCT ='Potato' WHERE PRODUCT = 'Banana'
 
 MERGE INTO SALES_FINAL_TABLE F      -- Target table to merge changes from source table
 USING SALES_STREAM S                -- Stream that has captured the changes
-   ON  f.id = s.id                 
+   ON  F.id = S.id                 
 WHEN matched AND
     S.METADATA$ACTION ='INSERT' AND
     S.METADATA$ISUPDATE ='TRUE'        -- Indicates the record has been updated 
     THEN UPDATE 
-    SET f.product = s.product,
-        f.price = s.price,
-        f.amount= s.amount,
-        f.store_id=s.store_id;
+    SET F.product = S.product,
+        F.price = S.price,
+        F.amount = S.amount,
+        F.store_id = S.store_id;
         
 SELECT * FROM SALES_FINAL_TABLE
 
@@ -155,15 +155,15 @@ SET PRODUCT ='Green apple' WHERE PRODUCT = 'Apple';
 
 MERGE INTO SALES_FINAL_TABLE F      -- Target table to merge changes from source table
 USING SALES_STREAM S                -- Stream that has captured the changes
-   ON  f.id = s.id                 
+   ON  F.id = S.id                 
 WHEN matched AND
     S.METADATA$ACTION ='INSERT' AND
     S.METADATA$ISUPDATE ='TRUE'        -- Indicates the record has been updated 
     THEN UPDATE 
-    SET f.product = s.product,
-        f.price = s.price,
-        f.amount= s.amount,
-        f.store_id=s.store_id;
+    SET F.product = S.product,
+        F.price = S.price,
+        F.amount = S.amount,
+        F.store_id = S.store_id;
 
 SELECT * FROM SALES_FINAL_TABLE;
 
@@ -172,7 +172,7 @@ SELECT * FROM SALES_RAW_STAGING;
 SELECT * FROM SALES_STREAM;
 
 
-// 17.3 Delete Operation
+-- 17.3 Delete Operation
   
 -- ******* DELETE  ********                
 SELECT * FROM SALES_FINAL_TABLE
@@ -187,14 +187,14 @@ WHERE PRODUCT = 'Lemon';
 -- ******* Process stream  ********            
 MERGE INTO SALES_FINAL_TABLE F      -- Target table to merge changes from source table
 USING SALES_STREAM S                -- Stream that has captured the changes
-   ON  f.id = s.id          
+   ON  F.id = S.id          
 WHEN matched AND
     S.METADATA$ACTION ='DELETE' AND
     S.METADATA$ISUPDATE = 'FALSE'
     THEN DELETE
 
 
-// 17.4 Process All Data Changes  
+-- 17.4 Process All Data Changes  
   
 -- ******* Process UPDATE,INSERT & DELETE simultaneously  ********                   
 MERGE INTO SALES_FINAL_TABLE F      -- Target table to merge changes from source table
@@ -203,7 +203,7 @@ USING ( SELECT STRE.*,ST.location,ST.employees
         JOIN STORE_TABLE ST
         ON STRE.store_id = ST.store_id
        ) S
-ON F.id=S.id
+ON F.id = S.id
 WHEN matched AND                        -- DELETE condition
     S.METADATA$ACTION ='DELETE' AND
     S.METADATA$ISUPDATE = 'FALSE'
@@ -212,16 +212,16 @@ WHEN matched AND                        -- UPDATE condition
     S.METADATA$ACTION ='INSERT' AND
     S.METADATA$ISUPDATE  = 'TRUE'       
     THEN UPDATE
-    SET f.product = s.product,
-        f.price = s.price,
-        f.amount= s.amount,
-        f.store_id=s.store_id
+    SET F.product = S.product,
+        F.price = S.price,
+        F.amount= S.amount,
+        F.store_id = S.store_id
 WHEN matched AND
     S.METADATA$ACTION ='INSERT'
     THEN INSERT 
     (id,product,price,store_id,amount,employees,location)
     VALUES
-    (s.id, s.product,s.price,s.store_id,s.amount,s.employees,s.location)
+    (S.id, S.product, S.price, S.store_id, S.amount, S.employees, S.location)
 
 SELECT * FROM SALES_RAW_STAGING;     
         
@@ -249,7 +249,7 @@ DELETE FROM SALES_RAW_STAGING
 WHERE PRODUCT = 'Potato';    
 
 
-// 17.5 Combine Streams & Tasks
+-- 17.5 Combine Streams & Tasks
 
 ------- Automatate the updates using tasks --
 CREATE OR REPLACE TASK all_data_changes
@@ -272,21 +272,21 @@ when matched AND                        -- UPDATE condition
     S.METADATA$ACTION ='INSERT' AND 
     S.METADATA$ISUPDATE  = 'TRUE'       
     THEN UPDATE 
-    set f.product = s.product,
-        f.price = s.price,
-        f.amount= s.amount,
-        f.store_id=s.store_id
+    set F.product = S.product,
+        F.price = S.price,
+        F.amount = S.amount,
+        F.store_id = S.store_id
 WHEN NOT matched AND 
     S.METADATA$ACTION ='INSERT'
     THEN INSERT 
     (id,product,price,store_id,amount,employees,location)
     VALUES
-    (s.id, s.product,s.price,s.store_id,s.amount,s.employees,s.location)
+    (S.id, S.product, S.price, S.store_id, S.amount, S.employees, S.location)
 
 ALTER TASK all_data_changes RESUME;
 SHOW TASKS;
 
-// Change data
+-- Change data
 
 INSERT INTO SALES_RAW_STAGING VALUES (11,'Milk',1.99,1,2);
 INSERT INTO SALES_RAW_STAGING VALUES (12,'Chocolate',4.49,1,2);
@@ -299,20 +299,20 @@ WHERE PRODUCT ='Chocolate';
 DELETE FROM SALES_RAW_STAGING
 WHERE PRODUCT = 'Mango';    
 
-// Verify results
+-- Verify results
 SELECT * FROM SALES_RAW_STAGING;     
         
 SELECT * FROM SALES_STREAM;
 
 SELECT * FROM SALES_FINAL_TABLE;
 
-// Verify the history
+-- Verify the history
 SELECT *
 FROM table(information_schema.task_history())
 ORDER BY name ASC,scheduled_time DESC;
 
 
-// 17.6 Type of Streams
+-- 17.6 Type of Streams
 ------- Append-only type ------
 USE STREAMS_DB;
 SHOW STREAMS;
@@ -362,7 +362,7 @@ SELECT * FROM SALES_STREAM_APPEND;
 SELECT * FROM SALES_STREAM;
 
 
-// 17.7 Change Clause
+-- 17.7 Change Clause
 ----- Change clause ------ 
 --- Create example db & table ---
 CREATE OR REPLACE DATABASE SALES_DB;
@@ -404,7 +404,7 @@ AT (timestamp => 'your-timestamp'::timestamp_tz)
 UPDATE SALES_RAW
 SET PRODUCT = 'Toast2' WHERE ID=6;
 
-// information value
+-- information value
 
 SELECT * FROM SALES_RAW
 CHANGES(information  => default)
